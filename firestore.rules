@@ -1,0 +1,256 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isValidDocId(id) {
+      return id is string && id.size() > 0 && id.size() <= 160;
+    }
+
+    function hasNonEmptyString(val, maxLen) {
+      return val is string && val.size() > 0 && val.size() <= maxLen;
+    }
+
+    function isMapWithMaxKeys(maxKeys) {
+      return request.resource.data is map && request.resource.data.keys().size() <= maxKeys;
+    }
+
+    // Startup connection check document
+    match /test/{docId} {
+      allow read: if docId == 'connection';
+      allow write: if false;
+    }
+
+    // Per-UID & username-alias user profile records
+    match /ze_users/{userId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(userId) &&
+        isMapWithMaxKeys(50) &&
+        (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() <= 160)) &&
+        (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.size() <= 160)) &&
+        (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 1000));
+      allow delete: if isValidDocId(userId);
+    }
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(userId) && isMapWithMaxKeys(50);
+      allow delete: if isValidDocId(userId);
+    }
+
+    // User profile posts (photos / videos)
+    match /ze_posts/{postId} {
+      allow read: if true;
+      allow create: if isValidDocId(postId) &&
+        isMapWithMaxKeys(30) &&
+        hasNonEmptyString(request.resource.data.uid, 128) &&
+        hasNonEmptyString(request.resource.data.userId, 128) &&
+        request.resource.data.uid == request.resource.data.userId;
+      allow update: if isValidDocId(postId) &&
+        isMapWithMaxKeys(30) &&
+        resource.data.uid == request.resource.data.uid &&
+        resource.data.userId == request.resource.data.userId;
+      allow delete: if isValidDocId(postId) && resource.data.uid is string;
+    }
+
+    // 24-hour user stories
+    match /stories/{storyId} {
+      allow read: if true;
+      allow create: if isValidDocId(storyId) &&
+        isMapWithMaxKeys(25) &&
+        hasNonEmptyString(request.resource.data.userId, 128);
+      allow update: if isValidDocId(storyId) &&
+        isMapWithMaxKeys(25) &&
+        resource.data.userId == request.resource.data.userId;
+      allow delete: if isValidDocId(storyId) && resource.data.userId is string;
+    }
+
+    // One-Account-One-KEY license keys
+    match /ze_keys/{keyId} {
+      allow read: if true;
+      allow create: if isValidDocId(keyId) &&
+        isMapWithMaxKeys(25) &&
+        hasNonEmptyString(request.resource.data.key, 128);
+      allow update: if isValidDocId(keyId) &&
+        isMapWithMaxKeys(25) &&
+        (!('boundUid' in resource.data) ||
+          resource.data.boundUid == '' ||
+          resource.data.boundUid == null ||
+          request.resource.data.boundUid == resource.data.boundUid);
+      allow delete: if false;
+    }
+
+    // Global chat feeds
+    match /ze_global_chats/{msgId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(msgId) &&
+        isMapWithMaxKeys(25) &&
+        hasNonEmptyString(request.resource.data.senderId, 128);
+      allow delete: if isValidDocId(msgId);
+    }
+
+    match /global_messages/{msgId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(msgId) &&
+        isMapWithMaxKeys(25) &&
+        hasNonEmptyString(request.resource.data.senderId, 128);
+      allow delete: if isValidDocId(msgId);
+    }
+
+    // Private chats & subcollections
+    match /chats/{chatId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(chatId) && isMapWithMaxKeys(30);
+      allow delete: if false;
+      match /{subpath=**} {
+        allow read: if true;
+        allow create, update: if isMapWithMaxKeys(25);
+        allow delete: if false;
+      }
+    }
+
+    match /private_chats/{chatId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(chatId) && isMapWithMaxKeys(30);
+      allow delete: if false;
+      match /{subpath=**} {
+        allow read: if true;
+        allow create, update: if isMapWithMaxKeys(25);
+        allow delete: if false;
+      }
+    }
+
+    // Room messages
+    match /messages/{msgId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(msgId) &&
+        isMapWithMaxKeys(25) &&
+        hasNonEmptyString(request.resource.data.senderId, 128);
+      allow delete: if isValidDocId(msgId);
+    }
+
+    // Friendships & friend requests
+    match /friendships/{friendshipId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(friendshipId) && isMapWithMaxKeys(20);
+      allow delete: if isValidDocId(friendshipId);
+    }
+
+    match /friend_requests/{reqId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(reqId) && isMapWithMaxKeys(20);
+      allow delete: if isValidDocId(reqId);
+    }
+
+    // Groups & Communities
+    match /groups/{groupId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(groupId) && isMapWithMaxKeys(30);
+      allow delete: if false;
+      match /{subpath=**} {
+        allow read: if true;
+        allow create, update: if isMapWithMaxKeys(25);
+        allow delete: if false;
+      }
+    }
+
+    match /communities/{commId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(commId) && isMapWithMaxKeys(30);
+      allow delete: if false;
+      match /{subpath=**} {
+        allow read: if true;
+        allow create, update: if isMapWithMaxKeys(25);
+        allow delete: if false;
+      }
+    }
+
+    // 24h Notes
+    match /notes/{noteId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(noteId) && isMapWithMaxKeys(20);
+      allow delete: if isValidDocId(noteId);
+    }
+
+    // Diamond+ Wallets & QRIS Orders
+    match /ze_wallets/{userId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(userId) &&
+        isMapWithMaxKeys(15) &&
+        request.resource.data.balance is number &&
+        request.resource.data.balance >= 0;
+      allow delete: if isValidDocId(userId);
+    }
+
+    match /ze_orders/{orderId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(orderId) &&
+        isMapWithMaxKeys(30) &&
+        hasNonEmptyString(request.resource.data.userId, 128);
+      allow delete: if false;
+    }
+
+    // Notifications, VN Panel config, Owner settings, Calls, Music History
+    match /ze_notifications/{notifId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(notifId) && isMapWithMaxKeys(25);
+      allow delete: if isValidDocId(notifId);
+    }
+
+    match /ze_vn_panel/{docId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(docId) && isMapWithMaxKeys(40);
+      allow delete: if isValidDocId(docId);
+    }
+
+    match /ze_settings/{docId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(docId) && isMapWithMaxKeys(40);
+      allow delete: if false;
+    }
+
+    match /ze_calls/{callId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(callId) && isMapWithMaxKeys(35);
+      allow delete: if isValidDocId(callId);
+    }
+
+    match /ze_music_history/{docId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(docId) && isMapWithMaxKeys(25);
+      allow delete: if isValidDocId(docId);
+    }
+
+    match /ze_config/{docId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(docId) &&
+        isMapWithMaxKeys(20) &&
+        (!('publicApiUrl' in request.resource.data) || (request.resource.data.publicApiUrl is string && request.resource.data.publicApiUrl.size() <= 512));
+      allow delete: if false;
+    }
+
+    match /ze_stickman_profiles/{userId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(userId) &&
+        isMapWithMaxKeys(25) &&
+        hasNonEmptyString(request.resource.data.userId, 128) &&
+        request.resource.data.coins is number &&
+        request.resource.data.coins >= 0 &&
+        request.resource.data.level is number &&
+        request.resource.data.level >= 1;
+      allow delete: if isValidDocId(userId);
+    }
+
+    match /ze_stickman_rooms/{roomId} {
+      allow read: if true;
+      allow create, update: if isValidDocId(roomId) &&
+        isMapWithMaxKeys(30) &&
+        hasNonEmptyString(request.resource.data.roomId, 128) &&
+        hasNonEmptyString(request.resource.data.hostId, 128);
+      allow delete: if isValidDocId(roomId);
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

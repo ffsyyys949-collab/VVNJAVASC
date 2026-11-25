@@ -1,0 +1,31 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Runtime databases & user uploads (do not commit runtime data/secrets)
+.global_zeio_db.json
+.features_zeio_db.json
+.stickman_war_db.json
+public/uploads/
+
+# Android / Gradle build outputs
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/captures/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Temp & editor files
+.aistudio/
+.vscode/
+.idea/
+tmp/

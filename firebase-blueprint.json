@@ -1,0 +1,330 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "VNJAVA user profile document stored by ID or lowercase username alias.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "username": { "type": "string" },
+        "username_lower": { "type": "string" },
+        "email": { "type": "string" },
+        "email_lower": { "type": "string" },
+        "name": { "type": "string" },
+        "bio": { "type": "string" },
+        "photo": { "type": "string" },
+        "avatar": { "type": "string" },
+        "role": { "type": "string" },
+        "isOwner": { "type": "boolean" },
+        "isAdmin": { "type": "boolean" },
+        "isVip": { "type": "boolean" },
+        "vip": { "type": "boolean" },
+        "vipLevel": { "type": "string" },
+        "isVipExclusive": { "type": "boolean" },
+        "vipExpiresAt": { "type": "number" },
+        "suspended": { "type": "boolean" },
+        "isVerified": { "type": "boolean" },
+        "followers": { "type": "array" },
+        "likesCount": { "type": "number" },
+        "lastActive": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "username"]
+    },
+    "PostItem": {
+      "title": "PostItem",
+      "description": "Profile video or photo post created by a user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string" },
+        "userId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorPhoto": { "type": "string" },
+        "mediaUrl": { "type": "string" },
+        "thumbnailUrl": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "caption": { "type": "string" },
+        "likes": { "type": "array" },
+        "likesCount": { "type": "number" },
+        "views": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["uid", "userId"]
+    },
+    "StoryItem": {
+      "title": "StoryItem",
+      "description": "24-hour user story entry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhoto": { "type": "string" },
+        "mediaUrl": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "caption": { "type": "string" },
+        "views": { "type": "array" },
+        "likes": { "type": "array" },
+        "createdAt": { "type": "number" },
+        "expiresAt": { "type": "number" }
+      },
+      "required": ["userId"]
+    },
+    "LicenseKey": {
+      "title": "LicenseKey",
+      "description": "VIP / Command license key with single-account binding.",
+      "type": "object",
+      "properties": {
+        "key": { "type": "string" },
+        "type": { "type": "string" },
+        "boundUid": { "type": "string" },
+        "boundToUserId": { "type": "string" },
+        "usedBy": { "type": "string" },
+        "revoked": { "type": "boolean" },
+        "isActive": { "type": "boolean" },
+        "expiresAt": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["key"]
+    },
+    "ChatChannel": {
+      "title": "ChatChannel",
+      "description": "Private, group, or community chat room metadata.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "participants": { "type": "array" },
+        "name": { "type": "string" },
+        "photo": { "type": "string" },
+        "lastMessage": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      }
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Chat message for global, private, group, or community channels.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "chatId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderPhoto": { "type": "string" },
+        "text": { "type": "string" },
+        "type": { "type": "string" },
+        "mediaUrl": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["senderId"]
+    },
+    "Friendship": {
+      "title": "Friendship",
+      "description": "Friend relationship or friend request document.",
+      "type": "object",
+      "properties": {
+        "fromId": { "type": "string" },
+        "toId": { "type": "string" },
+        "users": { "type": "array" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "number" }
+      }
+    },
+    "WalletBalance": {
+      "title": "WalletBalance",
+      "description": "Diamond+ currency wallet per user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "balance": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["userId", "balance"]
+    },
+    "PaymentOrder": {
+      "title": "PaymentOrder",
+      "description": "QRIS / TopUp / Key / VIP purchase order and verification record.",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string" },
+        "userId": { "type": "string" },
+        "kind": { "type": "string" },
+        "plan": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string" },
+        "proofUrl": { "type": "string" },
+        "issuedKey": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["orderId", "userId", "status"]
+    },
+    "NotificationItem": {
+      "title": "NotificationItem",
+      "description": "Global broadcast or targeted user notification.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "targetUserId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string" },
+        "readBy": { "type": "array" },
+        "createdAt": { "type": "number" }
+      }
+    },
+    "AppConfigRecord": {
+      "title": "AppConfigRecord",
+      "description": "Owner settings, VN panel metadata, calls, notes, and music history.",
+      "type": "object",
+      "properties": {
+        "updatedAt": { "type": "number" }
+      }
+    },
+    "StickmanProfile": {
+      "title": "StickmanProfile",
+      "description": "Stickman War player progress, coins, characters, owned weapons, weapon upgrade levels, gacha skins, and upgrade components.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "coins": { "type": "number" },
+        "level": { "type": "number" },
+        "xp": { "type": "number" },
+        "ownedWeapons": { "type": "array" },
+        "ownedSkins": { "type": "array" },
+        "ownedCharacters": { "type": "array" },
+        "equippedCharacter": { "type": "string" },
+        "upgradeMaterials": { "type": "object" },
+        "weaponLevels": { "type": "object" },
+        "ampasItems": { "type": "object" },
+        "equippedWeapon": { "type": "string" },
+        "equippedSkin": { "type": "string" },
+        "gachaPity": { "type": "number" },
+        "wins": { "type": "number" },
+        "losses": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["userId", "coins", "level"]
+    },
+    "StickmanRoom": {
+      "title": "StickmanRoom",
+      "description": "Stickman War 1vs1 Online and Petualangan Boss Mabar multiplayer room state.",
+      "type": "object",
+      "properties": {
+        "roomId": { "type": "string" },
+        "mode": { "type": "string" },
+        "status": { "type": "string" },
+        "hostId": { "type": "string" },
+        "guestId": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["roomId", "mode", "status", "hostId"]
+    }
+  },
+  "firestore": {
+    "/test/{docId}": {
+      "schema": "#/backend/entities/AppConfigRecord",
+      "description": "Public startup connectivity check document."
+    },
+    "/ze_users/{userId}": {
+      "schema": "#/backend/entities/UserProfile",
+      "description": "Primary global VNJAVA user accounts & aliases."
+    },
+    "/users/{userId}": {
+      "schema": "#/backend/entities/UserProfile",
+      "description": "Mirrored user profiles."
+    },
+    "/ze_posts/{postId}": {
+      "schema": "#/backend/entities/PostItem",
+      "description": "User profile photos & videos feed."
+    },
+    "/stories/{storyId}": {
+      "schema": "#/backend/entities/StoryItem",
+      "description": "24-hour user stories."
+    },
+    "/ze_keys/{keyId}": {
+      "schema": "#/backend/entities/LicenseKey",
+      "description": "VIP and command license keys."
+    },
+    "/ze_global_chats/{msgId}": {
+      "schema": "#/backend/entities/ChatMessage",
+      "description": "Global chat room messages."
+    },
+    "/global_messages/{msgId}": {
+      "schema": "#/backend/entities/ChatMessage",
+      "description": "Global chat messages mirror."
+    },
+    "/chats/{chatId}": {
+      "schema": "#/backend/entities/ChatChannel",
+      "description": "Private chat channels."
+    },
+    "/private_chats/{chatId}": {
+      "schema": "#/backend/entities/ChatChannel",
+      "description": "Private chat mirror."
+    },
+    "/messages/{msgId}": {
+      "schema": "#/backend/entities/ChatMessage",
+      "description": "Messages across private, group, and community rooms."
+    },
+    "/friendships/{friendshipId}": {
+      "schema": "#/backend/entities/Friendship",
+      "description": "Accepted friendships."
+    },
+    "/friend_requests/{reqId}": {
+      "schema": "#/backend/entities/Friendship",
+      "description": "Pending and responded friend requests."
+    },
+    "/groups/{groupId}": {
+      "schema": "#/backend/entities/ChatChannel",
+      "description": "Group chat rooms."
+    },
+    "/communities/{commId}": {
+      "schema": "#/backend/entities/ChatChannel",
+      "description": "Community rooms."
+    },
+    "/notes/{noteId}": {
+      "schema": "#/backend/entities/AppConfigRecord",
+      "description": "24-hour user status notes."
+    },
+    "/ze_wallets/{userId}": {
+      "schema": "#/backend/entities/WalletBalance",
+      "description": "User Diamond+ balances."
+    },
+    "/ze_orders/{orderId}": {
+      "schema": "#/backend/entities/PaymentOrder",
+      "description": "TopUp Diamond+ and Key Store payment orders."
+    },
+    "/ze_notifications/{notifId}": {
+      "schema": "#/backend/entities/NotificationItem",
+      "description": "Global and user notifications."
+    },
+    "/ze_vn_panel/{docId}": {
+      "schema": "#/backend/entities/AppConfigRecord",
+      "description": "VN Panel owner files configuration."
+    },
+    "/ze_settings/{docId}": {
+      "schema": "#/backend/entities/AppConfigRecord",
+      "description": "Owner panel authentication & purchase settings."
+    },
+    "/ze_calls/{callId}": {
+      "schema": "#/backend/entities/AppConfigRecord",
+      "description": "WebRTC / call signaling sessions."
+    },
+    "/ze_music_history/{docId}": {
+      "schema": "#/backend/entities/AppConfigRecord",
+      "description": "Saved Music Lab history per user."
+    },
+    "/ze_config/{docId}": {
+      "schema": "#/backend/entities/AppConfigRecord",
+      "description": "Dynamic server public API URL sync configuration."
+    },
+    "/ze_stickman_profiles/{userId}": {
+      "schema": "#/backend/entities/StickmanProfile",
+      "description": "Stickman War player profile, coins, weapons, and skins."
+    },
+    "/ze_stickman_rooms/{roomId}": {
+      "schema": "#/backend/entities/StickmanRoom",
+      "description": "Stickman War online 1vs1 and Co-op Boss Mabar rooms."
+    }
+  }
+}
